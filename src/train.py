@@ -37,23 +37,29 @@ if __name__ == '__main__':
     # To make order of variables same in validation an training datasets
     valid_df = valid_df[train_df.columns]
     
-    # TO Do
+    """
+    Convert categorical data inot numeric data using LabelEncoder
+    LabelEncoder()>  Encode the labels with numeric value starting from 0
+    Using '.values.tolist()' to get array object
+    transform()> Transform labels to normalized encoding (numeric values)   and replace the existing values with it
+    label_encoders list to store columns and LabelEncoder() instance
+    """
     label_encoders = []
     for c in train_df.columns:
-        lbl = preprocessing.LabelEncoder()
-        lbl.fit(train_df[c].values.tolist() + valid_df[c].values.tolist())
-        train_df.loc[:, c] = lbl.transform(train_df[c].values.tolist())
+        lbl = preprocessing.LabelEncoder() 
+        lbl.fit(train_df[c].values.tolist() + valid_df[c].values.tolist())             
+        train_df.loc[:, c] = lbl.transform(train_df[c].values.tolist()) 
         valid_df.loc[:, c] = lbl.transform(valid_df[c].values.tolist())
         label_encoders.append((c, lbl))
 
     # Data is ready to train
-    # Default value of n_estimators = 100
-    
+    # Default value of n_estimators = 100    
     clf = ensemble.RandomForestClassifier(n_estimators = 100, n_jobs = -1, verbose = 2)
     #clf = dispatcher.MODELS[MODEL]
     clf.fit(train_df, ytrain)
     predictions = clf.predict_proba(valid_df)[:, 1]
     print('Prediction = ', predictions)
-    # Use roc_auc_score when data skewed
+    # Use roc_auc_score when data is skewed
     print('roc_auc_score = ', metrics.roc_auc_score(yvalid, predictions))
+    
 
