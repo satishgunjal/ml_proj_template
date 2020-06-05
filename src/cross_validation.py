@@ -77,6 +77,15 @@ class CrossValidation:
             self.dataframe.loc[:len(self.dataframe) - num_holdout_samples, "kfold"] = 0
             self.dataframe.loc[len(self.dataframe) - num_holdout_samples:, "kfold"] = 1
 
+        elif self.problem_type == 'multilabel_classification':
+            if self.num_targets != 1:
+                raise Exception("Invalid number of targets for this problem type")
+            target = self.dataframe[self.target_cols[0]].apply(lambda x: len(str(x).split(self.multilabel_delimiter)))
+            kf = model_selection.StratifiedKFold(n_splits= self.num_folds, shuffle=False)
+
+            for fold, (train_idx, val_idx) in enumerate(kf.split(X= self.dataframe, y= target)):
+                self.dataframe.loc[val_idx, 'kfold'] = fold
+
         else:
             raise Exception('Problem type not understood')
         
@@ -88,20 +97,31 @@ if __name__ == '__main__':
     #_data_file_path = 'input/train.csv'
     #_target_cols = ['target']
     #_problem_type = "binary_classification"
+    #_shuffle = True
 
     ######## Testing for problem_type = "single_col_regression" ########      
     #_data_file_path = 'input/house_price_regression_train.csv'
     #_target_cols = ['SalePrice']
     #_problem_type = "single_col_regression"
+    #_shuffle = True
 
     ######## Testing for problem_type = "holdeout" ########      
-    _data_file_path = 'input/train.csv'
-    _target_cols = ['target']  # Not required  TODO modify the class to handle it
-    _problem_type = "holdout_10"
+    #_data_file_path = 'input/train.csv'
+    #_target_cols = ['target']  # Not required  TODO modify the class to handle it
+    #_problem_type = "holdout_10"
+    #_shuffle = False
+
+    ######## Testing for problem_type = "multilabel_classification" ######## 
+    # kaggle dataset link: https://www.kaggle.com/c/imet-2020-fgvc7/data?select=train.csv     
+    _data_file_path = 'input/multilabel_classification_train.csv'
+    _target_cols = ["attribute_ids"] 
+    _problem_type = "multilabel_classification"
+    _multilabel_delimiter = " "
+    _shuffle = True
 
     df = pd.read_csv(_data_file_path)
     print('Shape of the data = ', df.shape)     
-    cv = CrossValidation(df, shuffle=True, target_cols=_target_cols, problem_type=_problem_type)    
+    cv = CrossValidation(df, shuffle=_shuffle, target_cols=_target_cols, problem_type=_problem_type, multilabel_delimiter= _multilabel_delimiter)    
 
     df_split = cv.split()
     print('Count of kfold values in each fold= \n ', df_split.kfold.value_counts())
