@@ -22,7 +22,7 @@ if __name__ == '__main__':
     """
     kf = model_selection.StratifiedKFold(n_splits = 5, shuffle = False, random_state = 42)
 
-    # Lets split the data and assign the fold number to each batch
+    # Lets split the data and assign the fold number to each record
     #   enumerate function will iterate through every value returned by split()
     #   kf.split() will split the data into training and validation set
     #   fold values will be 0, 1, 2, 3, 4
