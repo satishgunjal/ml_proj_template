@@ -109,6 +109,7 @@ if __name__ == '__main__':
     X_full = pd.read_csv(_data_file_path)
     print('Shape of the X_full data = ', X_full.shape) 
 
+    ## Test method drop the rows which contain null values in target column
     ## Test method drop_columns()
 
     ## Test method good_bad_categorical_col()
